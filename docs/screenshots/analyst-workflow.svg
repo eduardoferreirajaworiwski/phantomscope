@@ -1,0 +1,59 @@
+<svg width="1200" height="680" viewBox="0 0 1200 680" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg2" x1="80" y1="60" x2="1120" y2="620" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#071018"/>
+      <stop offset="1" stop-color="#122C38"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#0F2330"/>
+      <stop offset="1" stop-color="#0B1A23"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="680" rx="28" fill="url(#bg2)"/>
+  <rect x="48" y="48" width="1104" height="584" rx="24" stroke="#1D4150" stroke-width="2"/>
+
+  <text x="82" y="106" fill="#9FE870" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700" letter-spacing="4">WORKFLOW</text>
+  <text x="82" y="150" fill="#DBE7EB" font-family="Arial, Helvetica, sans-serif" font-size="38" font-weight="700">How an Analyst Uses PhantomScope</text>
+  <text x="82" y="186" fill="#8DA4AD" font-family="Arial, Helvetica, sans-serif" font-size="20">The product is built around triage quality: gather evidence, rank findings, preserve rationale, and produce a report an analyst can defend.</text>
+
+  <g>
+    <rect x="88" y="256" width="184" height="234" rx="20" fill="url(#card)" stroke="#264F5F" stroke-width="2"/>
+    <circle cx="134" cy="304" r="20" fill="#9FE870"/>
+    <text x="126" y="312" fill="#06131A" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">1</text>
+    <text x="118" y="352" fill="#DBE7EB" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700">Scope</text>
+    <text x="118" y="384" fill="#8DA4AD" font-family="Arial, Helvetica, sans-serif" font-size="18">Enter a brand or domain and choose offline-safe demo mode or live enrichment.</text>
+
+    <rect x="298" y="256" width="184" height="234" rx="20" fill="url(#card)" stroke="#264F5F" stroke-width="2"/>
+    <circle cx="344" cy="304" r="20" fill="#79C0FF"/>
+    <text x="336" y="312" fill="#06131A" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">2</text>
+    <text x="328" y="352" fill="#DBE7EB" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700">Collect</text>
+    <text x="328" y="384" fill="#8DA4AD" font-family="Arial, Helvetica, sans-serif" font-size="18">Generate suspicious variants and correlate them with CT and infrastructure metadata.</text>
+
+    <rect x="508" y="256" width="184" height="234" rx="20" fill="url(#card)" stroke="#264F5F" stroke-width="2"/>
+    <circle cx="554" cy="304" r="20" fill="#FFD866"/>
+    <text x="546" y="312" fill="#06131A" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">3</text>
+    <text x="538" y="352" fill="#DBE7EB" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700">Rank</text>
+    <text x="538" y="384" fill="#8DA4AD" font-family="Arial, Helvetica, sans-serif" font-size="18">Apply deterministic rules that emit explicit risk signals, weights, and human-readable reasons.</text>
+
+    <rect x="718" y="256" width="184" height="234" rx="20" fill="url(#card)" stroke="#264F5F" stroke-width="2"/>
+    <circle cx="764" cy="304" r="20" fill="#FF7B72"/>
+    <text x="756" y="312" fill="#06131A" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">4</text>
+    <text x="746" y="352" fill="#DBE7EB" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700">Review</text>
+    <text x="746" y="384" fill="#8DA4AD" font-family="Arial, Helvetica, sans-serif" font-size="18">Inspect CT observations, registrar context, ASN clues, and evidence provenance without hidden scoring logic.</text>
+
+    <rect x="928" y="256" width="184" height="234" rx="20" fill="url(#card)" stroke="#264F5F" stroke-width="2"/>
+    <circle cx="974" cy="304" r="20" fill="#9FE870"/>
+    <text x="966" y="312" fill="#06131A" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">5</text>
+    <text x="952" y="352" fill="#DBE7EB" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700">Export</text>
+    <text x="952" y="384" fill="#8DA4AD" font-family="Arial, Helvetica, sans-serif" font-size="18">Download Markdown or JSON and hand the output to an analyst, reviewer, or interview panel.</text>
+  </g>
+
+  <path d="M272 372H298" stroke="#79C0FF" stroke-width="4" stroke-linecap="round"/>
+  <path d="M482 372H508" stroke="#79C0FF" stroke-width="4" stroke-linecap="round"/>
+  <path d="M692 372H718" stroke="#79C0FF" stroke-width="4" stroke-linecap="round"/>
+  <path d="M902 372H928" stroke="#79C0FF" stroke-width="4" stroke-linecap="round"/>
+
+  <text x="88" y="564" fill="#DBE7EB" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700">Portfolio Value</text>
+  <text x="88" y="602" fill="#8DA4AD" font-family="Arial, Helvetica, sans-serif" font-size="19">PhantomScope demonstrates product security judgment: modular provider adapters, bounded failure handling, reviewable scoring, and a reproducible offline demo path that remains honest about mock evidence.</text>
+</svg>

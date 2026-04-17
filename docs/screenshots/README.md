@@ -1,6 +1,11 @@
 # Screenshots
 
-Add presentation assets for GitHub and LinkedIn here.
+This folder contains repository-hosted presentation assets used by the README and future portfolio material.
+
+Current assets:
+
+- `architecture-overview.svg`
+- `analyst-workflow.svg`
 
 Recommended filenames:
 
