@@ -174,6 +174,15 @@ Or:
 make install
 ```
 
+Or with `pip` requirements files:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-dev.txt
+pip install -e .
+```
+
 ### Configure
 
 ```bash
@@ -205,6 +214,60 @@ make demo-interview
 ```
 
 This launches the API and Streamlit dashboard together in offline mode and prints the URLs needed for a live walkthrough.
+
+## Render Deployment
+
+PhantomScope is ready to deploy on Render as two web services:
+
+- `phantomscope-api`: FastAPI backend
+- `phantomscope-dashboard`: Streamlit frontend
+
+The repository already includes the pieces Render expects:
+
+- code in GitHub
+- `requirements.txt` and `requirements-dev.txt`
+- FastAPI app exposed from `phantomscope.api.main:app`
+- Streamlit entrypoint at `app/dashboard.py`
+- `.env.example`
+- healthcheck endpoint at `/api/v1/health`
+- environment-variable based configuration through `pydantic-settings`
+
+### Recommended Render setup
+
+Use the included [render.yaml](/home/eduardo/projects/phantomscope/render.yaml:1), or create the services manually in the Render dashboard.
+
+### API service
+
+- Service type: `Web Service`
+- Build command: `pip install -r requirements-dev.txt && pip install -e .`
+- Start command: `uvicorn phantomscope.api.main:app --host 0.0.0.0 --port $PORT`
+- Health check path: `/api/v1/health`
+
+Suggested environment variables:
+
+- `PHANTOMSCOPE_ENV=production`
+- `PHANTOMSCOPE_LOG_LEVEL=INFO`
+- `PHANTOMSCOPE_OFFLINE_MODE=true`
+- `PHANTOMSCOPE_DATABASE_URL=sqlite:///./phantomscope.db`
+
+### Dashboard service
+
+- Service type: `Web Service`
+- Build command: `pip install -r requirements-dev.txt && pip install -e .`
+- Start command: `streamlit run app/dashboard.py --server.port $PORT --server.address 0.0.0.0`
+
+Required environment variables:
+
+- `PHANTOMSCOPE_ENV=production`
+- `PHANTOMSCOPE_LOG_LEVEL=INFO`
+- `PHANTOMSCOPE_OFFLINE_MODE=true`
+- `PHANTOMSCOPE_DASHBOARD_API_URL=https://<your-api-service>.onrender.com/api/v1/analyses`
+
+### Notes
+
+- For a stable portfolio demo, keep `PHANTOMSCOPE_OFFLINE_MODE=true`.
+- SQLite is acceptable for MVP/demo deployment, but not ideal for stronger production-style persistence.
+- If you enable live mode later, configure any provider-specific environment variables through the Render dashboard.
 
 ## API Example
 
