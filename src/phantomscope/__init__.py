@@ -1,0 +1,2 @@
+"""PhantomScope package."""
+

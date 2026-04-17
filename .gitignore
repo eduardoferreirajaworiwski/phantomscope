@@ -1,0 +1,38 @@
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+.streamlit/
+
+# Local Codex/editor state
+.codex/
+.mcp.json
+.vscode/
+.idea/
+
+# Local overrides and secrets
+AGENTS.override.md
+**/AGENTS.override.md
+.env
+.env.*
+!.env.example
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Python artifacts
+*.pyc
+*.pyo
+*.pyd
+
+# Local databases and logs
+*.sqlite3
+*.db
+*.log
