@@ -4,7 +4,7 @@ import json
 import sqlite3
 from pathlib import Path
 
-from phantomscope.models.schemas import AnalysisResult
+from phantomscope.models.schemas import AnalysisListItem, AnalysisResult
 
 
 class AnalysisRepository:
@@ -53,9 +53,37 @@ class AnalysisRepository:
             return None
         return AnalysisResult.model_validate_json(row[0])
 
+    def list_recent(self, limit: int = 10) -> list[AnalysisListItem]:
+        with sqlite3.connect(self.path) as connection:
+            rows = connection.execute(
+                """
+                SELECT payload_json
+                FROM analysis_runs
+                ORDER BY created_at DESC
+                LIMIT ?
+                """,
+                (limit,),
+            ).fetchall()
+
+        analyses: list[AnalysisListItem] = []
+        for (payload_json,) in rows:
+            result = AnalysisResult.model_validate_json(payload_json)
+            analyses.append(
+                AnalysisListItem(
+                    analysis_id=result.analysis_id,
+                    created_at=result.created_at,
+                    target=result.target_profile.normalized_target,
+                    high_priority_count=sum(1 for asset in result.assets if asset.priority == "high"),
+                    medium_priority_count=sum(1 for asset in result.assets if asset.priority == "medium"),
+                    total_assets=len(result.assets),
+                    summary_headline=result.summary.headline,
+                    offline_mode=bool(result.metadata.get("offline_mode", False)),
+                )
+            )
+        return analyses
+
 
 def _resolve_sqlite_path(database_url: str) -> Path:
     if database_url.startswith("sqlite:///"):
         return Path(database_url.replace("sqlite:///", "", 1)).resolve()
     raise ValueError("Only sqlite URLs are supported in the MVP.")
-

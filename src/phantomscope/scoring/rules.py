@@ -1,33 +1,51 @@
 from phantomscope.models.schemas import CertificateObservation, DomainInfrastructure, DomainVariation, RiskSignal
 
+HIGH_RISK_TECHNIQUES = {
+    "homoglyph": 30,
+    "character-swap": 28,
+    "character-duplication": 18,
+    "character-omission": 18,
+}
+
+LURE_TECHNIQUES = {
+    "brand-prefix": 20,
+    "security-lure": 22,
+    "support-lure": 16,
+    "tld-blend": 12,
+}
+
 
 def score_asset(
     variation: DomainVariation,
     certificates: list[CertificateObservation],
     infrastructure: DomainInfrastructure,
-) -> tuple[int, str, list[RiskSignal]]:
+) -> tuple[int, str, list[RiskSignal], str]:
     score = 0
     signals: list[RiskSignal] = []
 
-    if variation.technique in {"homoglyph", "character-swap", "character-duplication"}:
-        score += 30
+    if variation.technique in HIGH_RISK_TECHNIQUES:
+        weight = HIGH_RISK_TECHNIQUES[variation.technique]
+        score += weight
         signals.append(
             RiskSignal(
                 code="lookalike-technique",
                 severity="high",
                 reason=f"Domain uses {variation.technique} to mimic the target.",
-                weight=30,
+                weight=weight,
+                evidence=[variation.domain, variation.technique],
             )
         )
 
-    if variation.technique in {"brand-prefix", "security-lure"}:
-        score += 20
+    if variation.technique in LURE_TECHNIQUES:
+        weight = LURE_TECHNIQUES[variation.technique]
+        score += weight
         signals.append(
             RiskSignal(
                 code="credential-lure-pattern",
                 severity="medium",
                 reason="Domain contains wording commonly used in phishing login lures.",
-                weight=20,
+                weight=weight,
+                evidence=variation.risk_context_tags or [variation.technique],
             )
         )
 
@@ -39,6 +57,7 @@ def score_asset(
                 severity="high",
                 reason="Certificate Transparency data shows the domain has active certificate activity.",
                 weight=25,
+                evidence=[certificate.source for certificate in certificates],
             )
         )
 
@@ -50,6 +69,7 @@ def score_asset(
                 severity="medium",
                 reason="Registration details suggest privacy shielding.",
                 weight=10,
+                evidence=[infrastructure.rdap_org or ""],
             )
         )
 
@@ -61,6 +81,7 @@ def score_asset(
                 severity="medium",
                 reason="Domain resolves to routable infrastructure.",
                 weight=10,
+                evidence=infrastructure.ip_addresses[:2],
             )
         )
 
@@ -73,6 +94,7 @@ def score_asset(
                 severity="medium",
                 reason=f"Basic reputation heuristics produced tags: {', '.join(infrastructure.reputation_tags)}.",
                 weight=bonus,
+                evidence=infrastructure.reputation_tags,
             )
         )
 
@@ -82,5 +104,6 @@ def score_asset(
     elif score >= 40:
         priority = "medium"
 
-    return min(score, 100), priority, signals
-
+    bounded_score = min(score, 100)
+    rationale = " + ".join(f"{signal.code} ({signal.weight})" for signal in signals) or "no triggered rules"
+    return bounded_score, priority, signals, rationale

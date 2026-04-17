@@ -11,8 +11,32 @@ class JsonFormatter(logging.Formatter):
             "logger": record.name,
             "message": record.getMessage(),
         }
-        if hasattr(record, "event"):
-            payload["event"] = record.event
+        for key, value in record.__dict__.items():
+            if key.startswith("_") or key in {
+                "args",
+                "created",
+                "exc_info",
+                "exc_text",
+                "filename",
+                "funcName",
+                "levelname",
+                "levelno",
+                "lineno",
+                "module",
+                "msecs",
+                "message",
+                "msg",
+                "name",
+                "pathname",
+                "process",
+                "processName",
+                "relativeCreated",
+                "stack_info",
+                "thread",
+                "threadName",
+            }:
+                continue
+            payload[key] = value
         return json.dumps(payload, ensure_ascii=True)
 
 
@@ -23,4 +47,3 @@ def configure_logging(level: str) -> None:
     root.handlers.clear()
     root.setLevel(level.upper())
     root.addHandler(handler)
-

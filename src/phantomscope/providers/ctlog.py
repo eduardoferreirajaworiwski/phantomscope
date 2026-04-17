@@ -4,7 +4,7 @@ import logging
 from datetime import UTC, datetime
 
 from phantomscope.core.config import Settings
-from phantomscope.models.schemas import CertificateObservation
+from phantomscope.models.schemas import CertificateObservation, DataOrigin
 from phantomscope.providers.http import HttpProvider
 from phantomscope.providers.mock_data import mock_certificate_observations
 
@@ -43,7 +43,8 @@ class CrtShProvider:
                     issuer_name=item.get("issuer_name", "unknown"),
                     common_name=item.get("common_name", domain),
                     matching_identities=str(item.get("name_value", domain)).split("\n"),
+                    source="crt.sh",
+                    origin=DataOrigin.LIVE,
                 )
             )
         return observations
-

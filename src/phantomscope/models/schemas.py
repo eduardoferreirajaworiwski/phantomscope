@@ -13,6 +13,12 @@ class TargetType(str, Enum):
     DOMAIN = "domain"
 
 
+class DataOrigin(str, Enum):
+    LIVE = "live"
+    MOCK = "mock"
+    FALLBACK = "fallback"
+
+
 class TargetRequest(BaseModel):
     target: str = Field(min_length=2, max_length=255)
     target_type: TargetType
@@ -33,12 +39,14 @@ class TargetProfile(BaseModel):
     normalized_target: str
     brand_keyword: str
     root_domain: str | None = None
+    apex_domain: str | None = None
 
 
 class DomainVariation(BaseModel):
     domain: str
     technique: str
     source_target: str
+    risk_context_tags: list[str] = Field(default_factory=list)
 
 
 class CertificateObservation(BaseModel):
@@ -46,6 +54,8 @@ class CertificateObservation(BaseModel):
     issuer_name: str
     common_name: str
     matching_identities: list[str] = Field(default_factory=list)
+    source: str = "crt.sh"
+    origin: DataOrigin = DataOrigin.LIVE
 
 
 class DomainInfrastructure(BaseModel):
@@ -55,7 +65,10 @@ class DomainInfrastructure(BaseModel):
     registrar: str | None = None
     asn: str | None = None
     asn_org: str | None = None
+    hosted_country: str | None = None
     reputation_tags: list[str] = Field(default_factory=list)
+    source: str = "composite-enrichment"
+    origin: DataOrigin = DataOrigin.LIVE
 
 
 class RiskSignal(BaseModel):
@@ -63,6 +76,7 @@ class RiskSignal(BaseModel):
     severity: str
     reason: str
     weight: int
+    evidence: list[str] = Field(default_factory=list)
 
 
 class ScoredAsset(BaseModel):
@@ -73,6 +87,8 @@ class ScoredAsset(BaseModel):
     certificate_observations: list[CertificateObservation] = Field(default_factory=list)
     infrastructure: DomainInfrastructure = Field(default_factory=DomainInfrastructure)
     risk_signals: list[RiskSignal] = Field(default_factory=list)
+    score_rationale: str
+    evidence_sources: list[str] = Field(default_factory=list)
 
 
 class AnalystSummary(BaseModel):
@@ -80,6 +96,7 @@ class AnalystSummary(BaseModel):
     executive_summary: str
     analyst_notes: list[str]
     recommended_actions: list[str]
+    grounding_notes: list[str]
     model_source: str
 
 
@@ -93,6 +110,28 @@ class AnalysisResult(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
+class AnalysisListItem(BaseModel):
+    analysis_id: str
+    created_at: datetime
+    target: str
+    high_priority_count: int
+    medium_priority_count: int
+    total_assets: int
+    summary_headline: str
+    offline_mode: bool
+
+
+class AnalysisListResponse(BaseModel):
+    analyses: list[AnalysisListItem]
+
+
+class ApiError(BaseModel):
+    detail: str
+    error_code: str
+
+
 class HealthResponse(BaseModel):
     status: str
-
+    version: str
+    environment: str
+    offline_mode: bool

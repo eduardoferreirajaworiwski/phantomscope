@@ -3,17 +3,17 @@ from __future__ import annotations
 import asyncio
 import logging
 
+from phantomscope.ai.service import AnalystSummaryService
 from phantomscope.core.config import Settings
 from phantomscope.db.repository import AnalysisRepository
 from phantomscope.discovery.domain_variants import generate_domain_variants
 from phantomscope.discovery.targets import build_target_profile
 from phantomscope.enrichment.service import EnrichmentService
-from phantomscope.models.schemas import AnalysisResult, ScoredAsset, TargetRequest
+from phantomscope.models.schemas import AnalysisListItem, AnalysisResult, ScoredAsset, TargetRequest
 from phantomscope.providers.ctlog import CrtShProvider
 from phantomscope.providers.enrichment import CompositeEnrichmentProvider
 from phantomscope.reporting.exporters import build_markdown_report
 from phantomscope.scoring.rules import score_asset
-from phantomscope.summarization.service import AnalystSummaryService
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ class AnalysisService:
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
         self.repository = AnalysisRepository(settings.database_url)
-        self.summary_service = AnalystSummaryService()
+        self.summary_service = AnalystSummaryService(settings)
 
     async def analyze(self, request: TargetRequest) -> AnalysisResult:
         offline_mode = self.settings.offline_mode if request.offline_mode is None else request.offline_mode
@@ -38,7 +38,7 @@ class AnalysisService:
 
         scored_assets: list[ScoredAsset] = []
         for variation, certificates, infrastructure in enriched_assets:
-            score, priority, signals = score_asset(variation, certificates, infrastructure)
+            score, priority, signals, rationale = score_asset(variation, certificates, infrastructure)
             if score == 0:
                 continue
             scored_assets.append(
@@ -50,17 +50,28 @@ class AnalysisService:
                     certificate_observations=certificates,
                     infrastructure=infrastructure,
                     risk_signals=signals,
+                    score_rationale=rationale,
+                    evidence_sources=sorted(
+                        {certificate.source for certificate in certificates} | {infrastructure.source}
+                    ),
                 )
             )
 
         scored_assets.sort(key=lambda item: item.score, reverse=True)
-        summary = self.summary_service.build_summary(target_profile, scored_assets)
+        summary = await self.summary_service.build_summary(target_profile, scored_assets, offline_mode)
         draft = AnalysisResult(
             target_profile=target_profile,
             assets=scored_assets,
             summary=summary,
             report_markdown="",
-            metadata={"offline_mode": offline_mode, "generated_variants": len(variations)},
+            metadata={
+                "offline_mode": offline_mode,
+                "generated_variants": len(variations),
+                "scored_assets": len(scored_assets),
+                "live_assets": sum(1 for asset in scored_assets if asset.infrastructure.origin.value == "live"),
+                "mock_assets": sum(1 for asset in scored_assets if asset.infrastructure.origin.value != "live"),
+                "ct_provider": "crt.sh",
+            },
         )
         result = draft.model_copy(update={"report_markdown": build_markdown_report(draft)})
         self.repository.save(result)
@@ -77,3 +88,5 @@ class AnalysisService:
     def get_analysis(self, analysis_id: str) -> AnalysisResult | None:
         return self.repository.get(analysis_id)
 
+    def list_recent_analyses(self, limit: int = 10) -> list[AnalysisListItem]:
+        return self.repository.list_recent(limit=limit)

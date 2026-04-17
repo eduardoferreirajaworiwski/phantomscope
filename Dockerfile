@@ -9,6 +9,8 @@ COPY pyproject.toml README.md ./
 COPY src ./src
 COPY app ./app
 COPY data ./data
+COPY .env.example ./.env.example
+COPY Makefile ./Makefile
 
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir .
@@ -16,4 +18,3 @@ RUN pip install --no-cache-dir --upgrade pip && \
 EXPOSE 8000
 
 CMD ["uvicorn", "phantomscope.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
-

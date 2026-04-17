@@ -4,7 +4,7 @@ import logging
 import socket
 
 from phantomscope.core.config import Settings
-from phantomscope.models.schemas import DomainInfrastructure
+from phantomscope.models.schemas import DataOrigin, DomainInfrastructure
 from phantomscope.providers.http import HttpProvider
 from phantomscope.providers.mock_data import mock_infrastructure
 
@@ -21,7 +21,7 @@ class CompositeEnrichmentProvider:
         if self.offline_mode:
             return mock_infrastructure(domain)
 
-        infrastructure = DomainInfrastructure()
+        infrastructure = DomainInfrastructure(source="live-composite", origin=DataOrigin.LIVE)
         infrastructure.ip_addresses = self._resolve_ips(domain)
         infrastructure.name_servers = []
 
@@ -38,9 +38,19 @@ class CompositeEnrichmentProvider:
             )
 
         if infrastructure.ip_addresses:
-            infrastructure.asn = "AS13335"
-            infrastructure.asn_org = "Generic Hosting Edge"
-            if domain.startswith("login-") or domain.endswith("secure.com"):
+            ip_context = await self.http.best_effort(
+                lambda: self.http.get_json(f"{self.settings.rdap_ip_base_url}{infrastructure.ip_addresses[0]}")
+            )
+            if isinstance(ip_context, dict):
+                start_autnum = ip_context.get("startAutnum")
+                end_autnum = ip_context.get("endAutnum")
+                infrastructure.asn = (
+                    f"AS{start_autnum}" if isinstance(start_autnum, int) else f"AS{end_autnum}" if isinstance(end_autnum, int) else None
+                )
+                infrastructure.asn_org = _extract_org(ip_context) or ip_context.get("name")
+                country = ip_context.get("country")
+                infrastructure.hosted_country = country if isinstance(country, str) else None
+            if domain.startswith("login-") or domain.endswith("secure.com") or "verify" in domain:
                 infrastructure.reputation_tags.append("recent-hosting-pattern")
 
         return infrastructure
@@ -86,4 +96,3 @@ def _flatten_vcard(vcard_array: list) -> str | None:
         if row[0] in {"fn", "org"} and len(row) >= 4:
             return row[3]
     return None
-

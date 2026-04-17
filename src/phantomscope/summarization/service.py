@@ -32,12 +32,17 @@ class AnalystSummaryService:
             "Escalate confirmed phishing lures to takedown or registrar-abuse workflows.",
             "Track repeated hosting and registrar patterns for clustering in future iterations.",
         ]
+        grounding_notes = [
+            "This legacy summarizer is deterministic and preserved for compatibility.",
+            "AI-assisted narrative generation lives under phantomscope.ai.",
+            "Risk score generation remains rule-based and separate from summarization.",
+        ]
 
         return AnalystSummary(
             headline=headline,
             executive_summary=executive_summary,
             analyst_notes=analyst_notes,
             recommended_actions=recommended_actions,
+            grounding_notes=grounding_notes,
             model_source="deterministic-analyst-narrative",
         )
-
