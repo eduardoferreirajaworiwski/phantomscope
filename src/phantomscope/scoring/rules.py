@@ -1,4 +1,9 @@
-from phantomscope.models.schemas import CertificateObservation, DomainInfrastructure, DomainVariation, RiskSignal
+from phantomscope.models.schemas import (
+    CertificateObservation,
+    DomainInfrastructure,
+    DomainVariation,
+    RiskSignal,
+)
 
 HIGH_RISK_TECHNIQUES = {
     "homoglyph": 30,
@@ -55,7 +60,10 @@ def score_asset(
             RiskSignal(
                 code="certificate-observed",
                 severity="high",
-                reason="Certificate Transparency data shows the domain has active certificate activity.",
+                reason=(
+                    "Certificate Transparency data shows the domain has "
+                    "active certificate activity."
+                ),
                 weight=25,
                 evidence=[certificate.source for certificate in certificates],
             )
@@ -92,7 +100,10 @@ def score_asset(
             RiskSignal(
                 code="reputation-tags",
                 severity="medium",
-                reason=f"Basic reputation heuristics produced tags: {', '.join(infrastructure.reputation_tags)}.",
+                reason=(
+                    "Basic reputation heuristics produced tags: "
+                    f"{', '.join(infrastructure.reputation_tags)}."
+                ),
                 weight=bonus,
                 evidence=infrastructure.reputation_tags,
             )
@@ -105,5 +116,8 @@ def score_asset(
         priority = "medium"
 
     bounded_score = min(score, 100)
-    rationale = " + ".join(f"{signal.code} ({signal.weight})" for signal in signals) or "no triggered rules"
+    rationale = (
+        " + ".join(f"{signal.code} ({signal.weight})" for signal in signals)
+        or "no triggered rules"
+    )
     return bounded_score, priority, signals, rationale

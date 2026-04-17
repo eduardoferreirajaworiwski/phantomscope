@@ -18,7 +18,10 @@ class HttpProvider:
         last_error: Exception | None = None
         for attempt in range(self._retries + 1):
             try:
-                async with httpx.AsyncClient(timeout=self._timeout, headers=self._headers) as client:
+                async with httpx.AsyncClient(
+                    timeout=self._timeout,
+                    headers=self._headers,
+                ) as client:
                     response = await client.get(url, params=params)
                     response.raise_for_status()
                     return response.json()
@@ -42,7 +45,10 @@ class HttpProvider:
         last_error: Exception | None = None
         for attempt in range(self._retries + 1):
             try:
-                async with httpx.AsyncClient(timeout=self._timeout, headers=request_headers) as client:
+                async with httpx.AsyncClient(
+                    timeout=self._timeout,
+                    headers=request_headers,
+                ) as client:
                     response = await client.post(url, json=json_body)
                     response.raise_for_status()
                     payload = response.json()

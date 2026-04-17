@@ -22,9 +22,19 @@ class CrtShProvider:
             return mock_certificate_observations(domain)
 
         try:
-            raw = await self.http.get_json(self.settings.crtsh_base_url, params={"q": domain, "output": "json"})
+            raw = await self.http.get_json(
+                self.settings.crtsh_base_url,
+                params={"q": domain, "output": "json"},
+            )
         except Exception as exc:
-            logger.warning("ct_lookup_failed", extra={"event": "ct_lookup_failed", "domain": domain, "error": str(exc)})
+            logger.warning(
+                "ct_lookup_failed",
+                extra={
+                    "event": "ct_lookup_failed",
+                    "domain": domain,
+                    "error": str(exc),
+                },
+            )
             return mock_certificate_observations(domain)
 
         observations: list[CertificateObservation] = []
@@ -34,7 +44,11 @@ class CrtShProvider:
         for item in raw[:5]:
             entry_ts = item.get("entry_timestamp")
             try:
-                logged_at = datetime.fromisoformat(entry_ts.replace(" ", "T")).astimezone(UTC) if entry_ts else datetime.now(UTC)
+                logged_at = (
+                    datetime.fromisoformat(entry_ts.replace(" ", "T")).astimezone(UTC)
+                    if entry_ts
+                    else datetime.now(UTC)
+                )
             except ValueError:
                 logged_at = datetime.now(UTC)
             observations.append(

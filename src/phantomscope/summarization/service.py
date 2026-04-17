@@ -10,25 +10,31 @@ class AnalystSummaryService:
         medium = [item for item in ranked if item.priority == "medium"]
 
         headline = (
-            f"{len(high)} high-priority suspicious domains identified for {target.normalized_target}"
+            f"{len(high)} high-priority suspicious domains identified for "
+            f"{target.normalized_target}"
             if high
             else f"No high-priority domains identified for {target.normalized_target}"
         )
 
         executive_summary = (
-            f"PhantomScope analyzed {len(assets)} generated assets related to {target.normalized_target}. "
-            f"{len(high)} were classified as high priority and {len(medium)} as medium priority based on "
-            "lookalike techniques, certificate activity, registration privacy, infrastructure resolution, "
-            "and reputation hints. AI assistance is used only to accelerate analyst triage; all scoring remains rule-based."
+            f"PhantomScope analyzed {len(assets)} generated assets related to "
+            f"{target.normalized_target}. "
+            f"{len(high)} were classified as high priority and {len(medium)} "
+            "as medium priority based on lookalike techniques, certificate "
+            "activity, registration privacy, infrastructure resolution, and "
+            "reputation hints. AI assistance is used only to accelerate analyst "
+            "triage; all scoring remains rule-based."
         )
 
         analyst_notes = [
-            f"{asset.domain} scored {asset.score}/100 with signals: {', '.join(signal.code for signal in asset.risk_signals)}."
+            f"{asset.domain} scored {asset.score}/100 with signals: "
+            f"{', '.join(signal.code for signal in asset.risk_signals)}."
             for asset in ranked[:3]
         ] or ["No suspicious assets were generated for review."]
 
         recommended_actions = [
-            "Validate whether high-priority domains are externally reachable and host brand-abuse content.",
+            "Validate whether high-priority domains are externally reachable "
+            "and host brand-abuse content.",
             "Escalate confirmed phishing lures to takedown or registrar-abuse workflows.",
             "Track repeated hosting and registrar patterns for clustering in future iterations.",
         ]

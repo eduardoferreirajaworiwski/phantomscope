@@ -41,15 +41,19 @@ class AnalystSummaryService:
                         {
                             "role": "system",
                             "content": (
-                                "You are a security analyst assistant. Summarize only the structured evidence provided. "
-                                "Do not invent evidence, confidence, attribution, or unseen infrastructure."
+                                "You are a security analyst assistant. "
+                                "Summarize only the structured evidence provided. "
+                                "Do not invent evidence, confidence, "
+                                "attribution, or unseen infrastructure."
                             ),
                         },
                         {
                             "role": "user",
                             "content": (
-                                "Produce a JSON object with keys: headline, executive_summary, analyst_notes, "
-                                "recommended_actions, grounding_notes. Base the output strictly on this evidence:\n"
+                                "Produce a JSON object with keys: headline, "
+                                "executive_summary, analyst_notes, "
+                                "recommended_actions, grounding_notes. Base "
+                                "the output strictly on this evidence:\n"
                                 f"{json.dumps(payload, indent=2)}"
                             ),
                         },
@@ -116,7 +120,10 @@ def _parse_ai_summary(response: dict[str, object], fallback: AnalystSummary) -> 
         headline=parsed.get("headline", fallback.headline),
         executive_summary=parsed.get("executive_summary", fallback.executive_summary),
         analyst_notes=_coerce_list(parsed.get("analyst_notes"), fallback.analyst_notes),
-        recommended_actions=_coerce_list(parsed.get("recommended_actions"), fallback.recommended_actions),
+        recommended_actions=_coerce_list(
+            parsed.get("recommended_actions"),
+            fallback.recommended_actions,
+        ),
         grounding_notes=_coerce_list(parsed.get("grounding_notes"), fallback.grounding_notes),
         model_source=f"openai:{response.get('model', fallback.model_source)}",
     )
@@ -128,7 +135,10 @@ def _coerce_list(value: object, fallback: list[str]) -> list[str]:
     return fallback
 
 
-def _build_deterministic_summary(target: TargetProfile, assets: list[ScoredAsset]) -> AnalystSummary:
+def _build_deterministic_summary(
+    target: TargetProfile,
+    assets: list[ScoredAsset],
+) -> AnalystSummary:
     ranked = sorted(assets, key=lambda item: item.score, reverse=True)
     high = [item for item in ranked if item.priority == "high"]
     medium = [item for item in ranked if item.priority == "medium"]
@@ -141,10 +151,13 @@ def _build_deterministic_summary(target: TargetProfile, assets: list[ScoredAsset
     )
 
     executive_summary = (
-        f"PhantomScope reviewed {len(ranked)} candidate domains associated with {target.normalized_target}. "
-        f"{len(high)} were classified as high priority and {len(medium)} as medium priority based on named, "
-        "rule-based signals covering lookalike technique, phishing lure language, CT log activity, registration "
-        "privacy, infrastructure resolution, and provider heuristics. "
+        f"PhantomScope reviewed {len(ranked)} candidate domains associated with "
+        f"{target.normalized_target}. "
+        f"{len(high)} were classified as high priority and {len(medium)} as "
+        "medium priority based on named, rule-based signals covering "
+        "lookalike technique, phishing lure language, CT log activity, "
+        "registration privacy, infrastructure resolution, and provider "
+        "heuristics. "
         f"{mock_count} findings include offline mock evidence for demo continuity."
     )
 
@@ -157,14 +170,19 @@ def _build_deterministic_summary(target: TargetProfile, assets: list[ScoredAsset
     ] or ["No candidate reached the current alerting threshold in this run."]
 
     recommended_actions = [
-        "Validate the highest-scoring domains for reachable login content before starting an abuse or takedown workflow.",
-        "Track repeated registrar, nameserver, and ASN patterns to cluster future brand-abuse campaigns.",
-        "Review domains backed only by mock evidence separately from live findings before external escalation.",
+        "Validate the highest-scoring domains for reachable login content "
+        "before starting an abuse or takedown workflow.",
+        "Track repeated registrar, nameserver, and ASN patterns to cluster "
+        "future brand-abuse campaigns.",
+        "Review domains backed only by mock evidence separately from live "
+        "findings before external escalation.",
     ]
     grounding_notes = [
         "Risk scoring is deterministic and does not accept direct model overrides.",
-        "AI output, when enabled, summarizes only the structured evidence included in the analysis payload.",
-        "Offline fixtures are explicitly marked as mock to keep demo evidence distinct from live provider data.",
+        "AI output, when enabled, summarizes only the structured evidence "
+        "included in the analysis payload.",
+        "Offline fixtures are explicitly marked as mock to keep demo evidence "
+        "distinct from live provider data.",
     ]
 
     return AnalystSummary(

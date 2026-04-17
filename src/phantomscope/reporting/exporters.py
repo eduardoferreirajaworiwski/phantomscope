@@ -46,7 +46,12 @@ def build_markdown_report(result: AnalysisResult) -> str:
                 "",
             ]
         )
-        lines.extend([f"- `{signal.code}` (+{signal.weight}): {signal.reason}" for signal in asset.risk_signals])
+        lines.extend(
+            [
+                f"- `{signal.code}` (+{signal.weight}): {signal.reason}"
+                for signal in asset.risk_signals
+            ]
+        )
         lines.append("")
 
     lines.extend(

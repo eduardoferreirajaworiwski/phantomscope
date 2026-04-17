@@ -15,16 +15,26 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="PhantomScope API",
-    description="Defensive OSINT analysis platform for phishing infrastructure and brand impersonation.",
+    description=(
+        "Defensive OSINT analysis platform for phishing infrastructure "
+        "and brand impersonation."
+    ),
     version="0.1.0",
 )
 
 
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+async def validation_exception_handler(
+    request: Request,
+    exc: RequestValidationError,
+) -> JSONResponse:
     logger.warning(
         "request_validation_failed",
-        extra={"event": "request_validation_failed", "path": str(request.url.path), "errors": exc.errors()},
+        extra={
+            "event": "request_validation_failed",
+            "path": str(request.url.path),
+            "errors": exc.errors(),
+        },
     )
     return JSONResponse(
         status_code=422,
@@ -36,7 +46,11 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     logger.exception(
         "unhandled_api_exception",
-        extra={"event": "unhandled_api_exception", "path": str(request.url.path), "error": str(exc)},
+        extra={
+            "event": "unhandled_api_exception",
+            "path": str(request.url.path),
+            "error": str(exc),
+        },
     )
     return JSONResponse(
         status_code=500,

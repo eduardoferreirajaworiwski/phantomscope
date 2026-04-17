@@ -25,12 +25,19 @@ class AnalysisService:
         self.summary_service = AnalystSummaryService(settings)
 
     async def analyze(self, request: TargetRequest) -> AnalysisResult:
-        offline_mode = self.settings.offline_mode if request.offline_mode is None else request.offline_mode
+        offline_mode = (
+            self.settings.offline_mode
+            if request.offline_mode is None
+            else request.offline_mode
+        )
         target_profile = build_target_profile(request)
         variations = generate_domain_variants(target_profile, request.max_variants)
         enrichment_service = EnrichmentService(
             ct_provider=CrtShProvider(self.settings, offline_mode=offline_mode),
-            enrichment_provider=CompositeEnrichmentProvider(self.settings, offline_mode=offline_mode),
+            enrichment_provider=CompositeEnrichmentProvider(
+                self.settings,
+                offline_mode=offline_mode,
+            ),
         )
 
         tasks = [enrichment_service.enrich_asset(variation) for variation in variations]
@@ -38,7 +45,11 @@ class AnalysisService:
 
         scored_assets: list[ScoredAsset] = []
         for variation, certificates, infrastructure in enriched_assets:
-            score, priority, signals, rationale = score_asset(variation, certificates, infrastructure)
+            score, priority, signals, rationale = score_asset(
+                variation,
+                certificates,
+                infrastructure,
+            )
             if score == 0:
                 continue
             scored_assets.append(
@@ -52,13 +63,18 @@ class AnalysisService:
                     risk_signals=signals,
                     score_rationale=rationale,
                     evidence_sources=sorted(
-                        {certificate.source for certificate in certificates} | {infrastructure.source}
+                        {certificate.source for certificate in certificates}
+                        | {infrastructure.source}
                     ),
                 )
             )
 
         scored_assets.sort(key=lambda item: item.score, reverse=True)
-        summary = await self.summary_service.build_summary(target_profile, scored_assets, offline_mode)
+        summary = await self.summary_service.build_summary(
+            target_profile,
+            scored_assets,
+            offline_mode,
+        )
         draft = AnalysisResult(
             target_profile=target_profile,
             assets=scored_assets,
@@ -68,8 +84,16 @@ class AnalysisService:
                 "offline_mode": offline_mode,
                 "generated_variants": len(variations),
                 "scored_assets": len(scored_assets),
-                "live_assets": sum(1 for asset in scored_assets if asset.infrastructure.origin.value == "live"),
-                "mock_assets": sum(1 for asset in scored_assets if asset.infrastructure.origin.value != "live"),
+                "live_assets": sum(
+                    1
+                    for asset in scored_assets
+                    if asset.infrastructure.origin.value == "live"
+                ),
+                "mock_assets": sum(
+                    1
+                    for asset in scored_assets
+                    if asset.infrastructure.origin.value != "live"
+                ),
                 "ct_provider": "crt.sh",
             },
         )

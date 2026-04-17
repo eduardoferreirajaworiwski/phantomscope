@@ -1,19 +1,19 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
 from pydantic import BaseModel, Field, field_validator
 
 
-class TargetType(str, Enum):
+class TargetType(StrEnum):
     BRAND = "brand"
     DOMAIN = "domain"
 
 
-class DataOrigin(str, Enum):
+class DataOrigin(StrEnum):
     LIVE = "live"
     MOCK = "mock"
     FALLBACK = "fallback"

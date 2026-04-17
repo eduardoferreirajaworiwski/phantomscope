@@ -94,8 +94,9 @@ st.markdown(
       <div class="eyebrow">Defensive OSINT Portfolio Build</div>
       <h1>PhantomScope</h1>
       <p class="muted">
-        Analyst-oriented triage for typosquatting, phishing lures and suspicious external infrastructure.
-        The dashboard keeps deterministic evidence, score explanations and mock/live provenance visible.
+        Analyst-oriented triage for typosquatting, phishing lures and suspicious
+        external infrastructure. The dashboard keeps deterministic evidence,
+        score explanations and mock/live provenance visible.
       </p>
     </div>
     """,
@@ -130,7 +131,9 @@ def render_finding(asset: dict[str, object]) -> None:
         <div class="finding">
           <h4 class="mono">{asset["domain"]}</h4>
           <div>
-            <span class="badge {badge_class}">{asset["priority"].upper()} · {asset["score"]}/100</span>
+            <span class="badge {badge_class}">
+              {asset["priority"].upper()} · {asset["score"]}/100
+            </span>
             <span class="badge">{asset["technique"]}</span>
             <span class="badge {source_class}">{origin.upper()}</span>
           </div>
@@ -195,7 +198,10 @@ if run:
             metrics = st.columns(5)
             metrics[0].metric("Candidates", metadata["generated_variants"])
             metrics[1].metric("Ranked Findings", metadata["scored_assets"])
-            metrics[2].metric("High Priority", sum(1 for asset in ranked_assets if asset["priority"] == "high"))
+            metrics[2].metric(
+                "High Priority",
+                sum(1 for asset in ranked_assets if asset["priority"] == "high"),
+            )
             metrics[3].metric("Live Findings", metadata["live_assets"])
             metrics[4].metric("Mock Findings", metadata["mock_assets"])
 
@@ -208,8 +214,10 @@ if run:
                 with left:
                     st.markdown("#### Recruiter Story")
                     st.write(
-                        "This run demonstrates an analyst workflow: generate likely lookalikes, correlate them "
-                        "with CT activity, enrich infrastructure, apply rule-based scoring, and summarize the result "
+                        "This run demonstrates an analyst workflow: generate "
+                        "likely lookalikes, correlate them with CT activity, "
+                        "enrich infrastructure, apply rule-based scoring, and "
+                        "summarize the result "
                         "without letting the model mutate the score."
                     )
                     st.markdown("#### Grounding")

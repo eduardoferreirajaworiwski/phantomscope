@@ -1,7 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from phantomscope.api.dependencies import get_analysis_service
-from phantomscope.models.schemas import AnalysisListResponse, AnalysisResult, ApiError, TargetRequest
+from phantomscope.models.schemas import (
+    AnalysisListResponse,
+    AnalysisResult,
+    ApiError,
+    TargetRequest,
+)
 from phantomscope.services.analysis import AnalysisService
 
 router = APIRouter(prefix="/analyses", tags=["analyses"])

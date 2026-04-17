@@ -16,7 +16,10 @@ def mock_certificate_observations(domain: str) -> list[CertificateObservation]:
     profile = _select_profile(domain, CT_FIXTURES)
     observations: list[CertificateObservation] = []
     for item in profile:
-        identities = [entry.format(domain=domain) for entry in item.get("matching_identities", [domain])]
+        identities = [
+            entry.format(domain=domain)
+            for entry in item.get("matching_identities", [domain])
+        ]
         observations.append(
             CertificateObservation(
                 logged_at=now - timedelta(days=item.get("days_ago", 2)),

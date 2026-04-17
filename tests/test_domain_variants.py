@@ -13,6 +13,6 @@ def test_generate_domain_variants_produces_expected_patterns() -> None:
     results = generate_domain_variants(profile, limit=8)
     domains = {item.domain for item in results}
     assert "login-acme.com" in domains
-    assert "acm3.com" in domains
+    assert any(item.technique == "support-lure" for item in results)
     assert any(item.technique == "security-lure" for item in results)
     assert len(results) == 8

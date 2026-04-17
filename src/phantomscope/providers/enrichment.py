@@ -26,11 +26,17 @@ class CompositeEnrichmentProvider:
         infrastructure.name_servers = []
 
         try:
-            rdap_data = await self.http.best_effort(lambda: self.http.get_json(f"{self.settings.rdap_base_url}{domain}"))
+            rdap_data = await self.http.best_effort(
+                lambda: self.http.get_json(f"{self.settings.rdap_base_url}{domain}")
+            )
             if isinstance(rdap_data, dict):
                 infrastructure.registrar = _extract_registrar(rdap_data)
                 infrastructure.rdap_org = _extract_org(rdap_data)
-                infrastructure.name_servers = [item.get("ldhName", "") for item in rdap_data.get("nameservers", []) if item.get("ldhName")]
+                infrastructure.name_servers = [
+                    item.get("ldhName", "")
+                    for item in rdap_data.get("nameservers", [])
+                    if item.get("ldhName")
+                ]
         except Exception as exc:
             logger.warning(
                 "rdap_lookup_failed",
@@ -39,13 +45,19 @@ class CompositeEnrichmentProvider:
 
         if infrastructure.ip_addresses:
             ip_context = await self.http.best_effort(
-                lambda: self.http.get_json(f"{self.settings.rdap_ip_base_url}{infrastructure.ip_addresses[0]}")
+                lambda: self.http.get_json(
+                    f"{self.settings.rdap_ip_base_url}{infrastructure.ip_addresses[0]}"
+                )
             )
             if isinstance(ip_context, dict):
                 start_autnum = ip_context.get("startAutnum")
                 end_autnum = ip_context.get("endAutnum")
                 infrastructure.asn = (
-                    f"AS{start_autnum}" if isinstance(start_autnum, int) else f"AS{end_autnum}" if isinstance(end_autnum, int) else None
+                    f"AS{start_autnum}"
+                    if isinstance(start_autnum, int)
+                    else f"AS{end_autnum}"
+                    if isinstance(end_autnum, int)
+                    else None
                 )
                 infrastructure.asn_org = _extract_org(ip_context) or ip_context.get("name")
                 country = ip_context.get("country")

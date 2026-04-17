@@ -1,4 +1,8 @@
-from phantomscope.models.schemas import CertificateObservation, DomainInfrastructure, DomainVariation
+from phantomscope.models.schemas import (
+    CertificateObservation,
+    DomainInfrastructure,
+    DomainVariation,
+)
 from phantomscope.scoring.rules import score_asset
 
 

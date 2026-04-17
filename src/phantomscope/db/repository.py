@@ -73,8 +73,12 @@ class AnalysisRepository:
                     analysis_id=result.analysis_id,
                     created_at=result.created_at,
                     target=result.target_profile.normalized_target,
-                    high_priority_count=sum(1 for asset in result.assets if asset.priority == "high"),
-                    medium_priority_count=sum(1 for asset in result.assets if asset.priority == "medium"),
+                    high_priority_count=sum(
+                        1 for asset in result.assets if asset.priority == "high"
+                    ),
+                    medium_priority_count=sum(
+                        1 for asset in result.assets if asset.priority == "medium"
+                    ),
                     total_assets=len(result.assets),
                     summary_headline=result.summary.headline,
                     offline_mode=bool(result.metadata.get("offline_mode", False)),

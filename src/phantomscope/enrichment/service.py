@@ -1,13 +1,21 @@
 from __future__ import annotations
 
-from phantomscope.models.schemas import CertificateObservation, DomainInfrastructure, DomainVariation
 from phantomscope.collectors.ct_logs import CTLogCollector
+from phantomscope.models.schemas import (
+    CertificateObservation,
+    DomainInfrastructure,
+    DomainVariation,
+)
 from phantomscope.providers.ctlog import CrtShProvider
 from phantomscope.providers.enrichment import CompositeEnrichmentProvider
 
 
 class EnrichmentService:
-    def __init__(self, ct_provider: CrtShProvider, enrichment_provider: CompositeEnrichmentProvider) -> None:
+    def __init__(
+        self,
+        ct_provider: CrtShProvider,
+        enrichment_provider: CompositeEnrichmentProvider,
+    ) -> None:
         self.ct_collector = CTLogCollector(ct_provider)
         self.enrichment_provider = enrichment_provider
 
